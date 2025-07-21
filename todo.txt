@@ -1,0 +1,2 @@
+1. delete otps after use
+2. check if course is published then only set chapter publish or wise versa

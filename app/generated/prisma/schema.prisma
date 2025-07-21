@@ -1,0 +1,214 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  SELLER
+  VIEWER
+}
+
+model User {
+  id                  String    @id @default(cuid())
+  username            String    @unique
+  email               String    @unique
+  number              String?   @unique
+  name                String
+  role                Role      @default(VIEWER)
+  password            String?
+  avatar              String?   @default("https://res.cloudinary.com/dgu6xwnzx/image/upload/v1749624192/LMS/Profile_Image/oo1kwuf2jmfgednphxxf.jpg")
+  bio                 String?
+  provider            String    @default("credential")
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  resetToken          String?
+  resetTokenExpires   DateTime?
+  isBanned            Boolean   @default(false)
+  isVerified          Boolean   @default(false)
+  isTwoStepAuthOn     Boolean   @default(false)
+  showEmailPublicly   Boolean   @default(false)
+  markedForDeletion   Boolean   @default(false)
+  deletionScheduledAt DateTime?
+
+  // Relations
+  Courses             Course[]             @relation("InstructorCourses")
+  Enrollments         Enrollment[]
+  Progress            Progress[]
+  Reviews             Review[]
+  PaymentAccounts     PaymentAccount[]
+  Payments            Payment[]
+  SessionLog          SessionLog?
+  NotificationSetting NotificationSetting?
+  VerificationRequest VerificationRequest?
+}
+
+model Course {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  thumbnail    String   @default("https://res.cloudinary.com/dgu6xwnzx/image/upload/v1751305148/default_thumbnail_lbo8jj.png")
+  category     String
+  validityDays Int
+  isPaid       Boolean  @default(false)
+  isApproved   Boolean  @default(false)
+  status       String   @default("UNPUBLISHED") // PUBLISHED, UNPUBLISHED
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  totalPrice   Int?
+  actualPrice  Int?
+
+  instructor   User   @relation("InstructorCourses", fields: [instructorId], references: [id], onDelete: Cascade)
+  instructorId String
+
+  Chapters    Chapter[]
+  Enrollments Enrollment[]
+  Payments    Payment[]
+  Reviews     Review[]
+  Progress    Progress[]
+
+  @@unique([title, instructorId])
+}
+
+model Chapter {
+  id        String   @id @default(cuid())
+  title     String
+  order     Int
+  videoUrl  String?
+  pdfUrl    String?
+  notes     String?
+  status    String   @default("UNPUBLISHED") // PUBLISHED, UNPUBLISHED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId String
+
+  @@unique([title, courseId])
+}
+
+model PaymentAccount {
+  id                String    @id @default(cuid())
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String
+  vendorId          String    @unique
+  accountNumber     String?
+  ifscCode          String?
+  upiId             String?
+  uidai             String
+  pan               String
+  accountHolderName String
+  status            String    @default("PENDING")
+  isPrimary         Boolean   @default(false)
+  verifiedAt        DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+model Payment {
+  id          String    @id @default(cuid())
+  orderId     String    @unique // Cashfree Order ID
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  course      Course?   @relation(fields: [courseId], references: [id])
+  courseId    String?
+  amount      Float
+  currency    String    @default("INR")
+  status      String    @default("PENDING") // PENDING, SUCCESS, FAILED
+  paymentMode String? // UPI, Card, NetBanking, etc.
+  cfPaymentId String? // Cashfree payment ID (from webhook or fetch)
+  paidAt      DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Progress {
+  id     String @id @default(cuid())
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId String
+
+  chapterId String
+  completed Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int      @default(5)
+  comment   String?
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId String
+}
+
+model OTP {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  code      String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
+
+model Enrollment {
+  id     String @id @default(cuid())
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId String
+
+  enrolledAt DateTime @default(now())
+}
+
+model NotificationSetting {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  newCourseAvailable  Boolean @default(true)
+  newChapterAvailable Boolean @default(true)
+  newPaymentReceived  Boolean @default(true)
+  bankVerified        Boolean @default(true)
+  withdrawalProcessed Boolean @default(true)
+  promotionalUpdates  Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationRequest {
+  id     String @id @default(cuid())
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+
+  note       String? // Optional note from user
+  status     String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  reviewedBy String? // Admin ID or email
+  reviewedAt DateTime?
+  createdAt  DateTime  @default(now())
+}
+
+model SessionLog {
+  id         String   @id @default(cuid())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String   @unique
+  ipAddress  String?
+  os         String?
+  browser    String?
+  device     String?
+  location   String?
+  lastActive DateTime @default(now())
+  createdAt  DateTime @default(now())
+}

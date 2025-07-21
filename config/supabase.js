@@ -1,0 +1,11 @@
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+// Client for public operations
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Admin client for bucket management (server-side only)
+export const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
