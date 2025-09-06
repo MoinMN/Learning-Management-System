@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Learning Management System (LMS) 🚀
 
-## Getting Started
+[![Status](https://img.shields.io/badge/status-under%20development-orange)](https://github.com/yourusername/lms)
+[![Built With](https://img.shields.io/badge/built%20with-Next.js-61DAFB)](https://nextjs.org/)
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Overview
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**Learning Management System (LMS)** is a **web-based platform under development** built with **Next.js, Node.js, Prisma, and PostgreSQL**, where users can **create, sell, and buy courses** in multiple formats such as **videos, PDFs, and text**. Integrated with **Cashfree payment gateway** with **split revenue functionality** (e.g., 5% platform cut). The platform is designed to be **scalable, secure, and user-friendly**, with responsive design for all devices.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Features
 
-## Learn More
+- Upload and sell courses in multiple formats (video, PDF, text)  
+- Purchase courses securely with **Cashfree payments** and automatic split revenue  
+- User dashboards for course management and purchase history  
+- Secure authentication and authorization  
+- Analytics for users and platform insights  
+- Responsive UI with **Next.js**  
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Frontend:** Next.js, React.js, Tailwind CSS, Material UI, Shadcn UI  
+- **Backend:** Node.js, Prisma ORM  
+- **Database:** PostgreSQL  
+- **Payment:** Cashfree API  
+- **Authentication:** NextAuth  
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
